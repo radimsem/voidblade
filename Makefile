@@ -1,15 +1,23 @@
-CXX = gcc
-CXXFLAGS = `sdl2-config --libs --cflags` -ggdb3 -O0 --std=c99 -Wall -lm
-SRC = src/main.c
-OBJ = main.o
-EXE = voidblade
+CC = clang
 
-$(EXE): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(EXE) $(OBJ)
+CCFLAGS = `sdl2-config --libs --cflags`
+CCFLAGS += -ggdb3
+CCFLAGS += -O0
+CCFLAGS += -std=c99
+CCFLAGS += -Wall
+CCFLAGS += -lm
+
+SRC = src/main.c
+OBJ = ./main.o
+EXE = ./voidblade
+
+all: $(EXE)
 
 $(OBJ): $(SRC)
-	$(CXX) $(CXXFLAGS) -c $(SRC)
+	$(CC) $(CCFLAGS) -c $(SRC)
 
-.PHONY: clean
+$(EXE): $(OBJ)
+	$(CC) $(CCFLAGS) -o $(EXE) $(OBJ)
+
 clean:
 	rm -f $(OBJ) $(EXE)

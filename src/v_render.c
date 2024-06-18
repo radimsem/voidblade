@@ -4,7 +4,6 @@
 #include "v_map.h"
 
 #include "v_math.c"
-#include "v_map.c"
 
 #include "v_render.h"
 
