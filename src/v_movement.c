@@ -11,31 +11,33 @@ void rotate(offset_pt_t *v, float rot) {
     v->y = (_x * sin(rot)) + (v->y * cos(rot));
 }
 
-void move(offset_pt_t *pos, offset_pt_t *dir, float speed, move_t mov) {
-    float _x = pos->x, _y = pos->y;
+void move(offset_pt_t *pos, offset_pt_t *dir, float speed, move_t type) {
+    offset_pt_t move;
 
-    switch (mov) {
+    switch (type) {
         case FORWARD:
-            pos->x += dir->x * speed;
-            pos->y += dir->y * speed;
+            move.x = pos->x + dir->x * speed;
+            move.y = pos->y + dir->y * speed;
             break;
         case BACKWARD:
-            pos->x -= dir->x * speed;
-            pos->y -= dir->y * speed;
+            move.x = pos->x - dir->x * speed;
+            move.y = pos->y - dir->y * speed;
             break;
     }
 
     tile_pt_t map_pos = {
-        (int) pos->x,
-        (int) pos->y
+        (int) move.x,
+        (int) move.y
     };
+
     if (map_pos.x < 0 ||
         map_pos.x >= MAP_SIZE ||
         map_pos.y < 0 ||
         map_pos.y >= MAP_SIZE ||
         MAP_DATA[(map_pos.y * MAP_SIZE) + map_pos.x] > 0)
     {
-        pos->x = _x;
-        pos->y = _y;
+        return;
     }
+
+    *pos = move;
 }
