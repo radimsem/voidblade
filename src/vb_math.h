@@ -1,7 +1,7 @@
-#include "v_types.h"
+#include "vb_types.h"
 
-#ifndef __V_MATH__
-#define __V_MATH__
+#ifndef __VB_MATH__
+#define __VB_MATH__
 
 extern inline int sign(float x);
 

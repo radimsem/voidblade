@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_events.h>
@@ -6,8 +7,8 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_keycode.h>
 
-#include "v_render.c"
-#include "v_movement.c"
+#include "vb_render.c"
+#include "vb_input.c"
 
 int main() {
     ASSERT(!SDL_Init(SDL_INIT_VIDEO),
@@ -40,7 +41,7 @@ int main() {
     );
     ASSERT(state_s.texture, "failed to create SDL texture: %s", SDL_GetError());
 
-    state_s.pos.x = 2.5f;
+    state_s.pos.x = 4.5f;
     state_s.pos.y = 2.5f;
 
     state_s.dir.x = 1.0f;
@@ -51,9 +52,10 @@ int main() {
     state_s.plane.x = 0.0f;
     state_s.plane.y = 0.66f;
 
-    state_s.speed.rot = 3.0f * 0.016f;
-    state_s.speed.move = 3.0f * 0.016f;
+    state_s.speed.rot = 3.0f * 0.001f;
+    state_s.speed.move = 3.0f * 0.001f;
 
+    state_s.keys = SDL_GetKeyboardState(NULL);
     state_s.quit = false;
 
     while (!state_s.quit) {
@@ -64,25 +66,10 @@ int main() {
                 case SDL_QUIT:
                     state_s.quit = true;
                     break;
-                case SDL_KEYDOWN:
-                    switch (event.key.keysym.sym) {
-                        case SDLK_w:
-                            move(&state_s.pos, &state_s.dir, state_s.speed.move, FORWARD);
-                            break;
-                        case SDLK_s:
-                            move(&state_s.pos, &state_s.dir, state_s.speed.move, BACKWARD);
-                            break;
-                        case SDLK_a:
-                            rotate(&state_s.dir, -state_s.speed.rot);
-                            rotate(&state_s.plane, -state_s.speed.rot);
-                            break;
-                        case SDLK_d:
-                            rotate(&state_s.dir, +state_s.speed.rot);
-                            rotate(&state_s.plane, +state_s.speed.rot);
-                            break;
-                    }
             }
         }
+
+        handle_keys();
 
         memset(state_s.pixels, 0, sizeof(state_s.pixels));
         render();

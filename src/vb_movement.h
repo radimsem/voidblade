@@ -1,7 +1,7 @@
-#include "v_types.h"
+#include "vb_types.h"
 
-#ifndef __V_MOVEMENT__
-#define __V_MOVEMENT__
+#ifndef __VB_MOVEMENT__
+#define __VB_MOVEMENT__
 
 typedef enum {
     FORWARD,

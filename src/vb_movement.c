@@ -1,9 +1,9 @@
 #include <math.h>
 
-#include "v_types.h"
-#include "v_map.h"
+#include "vb_types.h"
+#include "vb_map.h"
 
-#include "v_movement.h"
+#include "vb_movement.h"
 
 void rotate(offset_pt_t *v, float rot) {
     float _x = v->x;

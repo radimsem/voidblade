@@ -1,11 +1,11 @@
-#include "v_macros.h"
-#include "v_types.h"
-#include "v_state.h"
-#include "v_map.h"
+#include "vb_macros.h"
+#include "vb_types.h"
+#include "vb_state.h"
+#include "vb_map.h"
 
-#include "v_math.c"
+#include "vb_math.c"
 
-#include "v_render.h"
+#include "vb_render.h"
 
 static void verline(int x, int y0, int y1, uint32_t color) {
     for (int y = y0; y <= y1; y++) {

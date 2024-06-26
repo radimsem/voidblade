@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef __V_RENDER__
-#define __V_RENDER__
+#ifndef __VB_RENDER__
+#define __VB_RENDER__
 
 typedef enum {
     HORIZONTAL,

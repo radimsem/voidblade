@@ -1,13 +1,15 @@
+#include <stdint.h>
 #include <stdbool.h>
 
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_render.h>
 
-#include "v_macros.h"
-#include "v_types.h"
+#include "vb_macros.h"
+#include "vb_types.h"
+#include "vb_texture.h"
 
-#ifndef __V_STATE__
-#define __V_STATE__
+#ifndef __VB_STATE__
+#define __VB_STATE__
 
 typedef struct {
     float rot, move;
@@ -23,6 +25,9 @@ static struct {
 
     offset_pt_t pos, dir, plane;
     speed_t speed;
+
+    int textures[TEXTURES_COUNT][TEXTURE_WIDTH * TEXTURE_HEIGHT];
+    const uint8_t *keys;
 } state_s;
 
 #endif
