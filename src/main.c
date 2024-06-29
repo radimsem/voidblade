@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_render.h>
@@ -7,8 +8,8 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_keycode.h>
 
-#include "vb_render.c"
 #include "vb_input.c"
+#include "vb_render.c"
 
 int main() {
     ASSERT(!SDL_Init(SDL_INIT_VIDEO),
@@ -41,6 +42,9 @@ int main() {
     );
     ASSERT(state_s.texture, "failed to create SDL texture: %s", SDL_GetError());
 
+    state_s.surface = IMG_Load(TEXTURE_FILE);
+    ASSERT(state_s.surface, "failed to create SDL surface from image %s: %s", TEXTURE_FILE, SDL_GetError());
+
     state_s.pos.x = 4.5f;
     state_s.pos.y = 2.5f;
 
@@ -56,6 +60,7 @@ int main() {
     state_s.speed.move = 3.0f * 0.001f;
 
     state_s.keys = SDL_GetKeyboardState(NULL);
+
     state_s.quit = false;
 
     while (!state_s.quit) {

@@ -5,6 +5,7 @@ CCFLAGS += -ggdb3
 CCFLAGS += -O0
 CCFLAGS += -std=c99
 CCFLAGS += -Wall
+CCFLAGS += -lSDL2_image
 CCFLAGS += -lm
 
 SRC = src/main.c

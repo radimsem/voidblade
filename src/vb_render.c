@@ -4,6 +4,7 @@
 #include "vb_map.h"
 
 #include "vb_math.c"
+#include "vb_texture.c"
 
 #include "vb_render.h"
 
@@ -66,33 +67,26 @@ void render() {
             hit.value = MAP_DATA[(map_pos.y * MAP_SIZE) + map_pos.x];
         }
 
-        uint32_t color;
-        switch (hit.value) {
-            case 1: color = 0xFF0000FF; break;
-            case 2: color = 0xFF00FF00; break;
-            case 3: color = 0xFFFF0000; break;
-            case 4: color = 0xFFFF00FF; break;
-        }
+        hit.pos.x = state_s.pos.x + side_dist.x;
+        hit.pos.y = state_s.pos.y + side_dist.y;
 
-        float dist_to_hit;
         switch (hit.side) {
             case HORIZONTAL:
-                dist_to_hit = side_dist.x - delta_dist.x;
+                hit.dist = side_dist.x - delta_dist.x;
                 break;
             case VERTICAL: {
-                color = (color & 0xFEFEFE) >> 1;
-                dist_to_hit = side_dist.y - delta_dist.y;
+                hit.dist = side_dist.y - delta_dist.y;
                 break;
             }
         }
 
         int
-            h = SCREEN_HEIGHT / dist_to_hit,
+            h = SCREEN_HEIGHT / hit.dist,
             y0 = max((SCREEN_HEIGHT / 2) - (h / 2), 0),
             y1 = min((SCREEN_HEIGHT / 2) + (h / 2), SCREEN_HEIGHT - 1);
 
         verline(x, 0, y0, 0xFF202020);
-        verline(x, y0, y1, color);
+        draw_texture_line(x, y0, y1, h, &ray_dir, &hit);
         verline(x, y1, SCREEN_HEIGHT - 1, 0xFF505050);
     }
 }
