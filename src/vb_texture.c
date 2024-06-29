@@ -24,9 +24,11 @@ extern void draw_texture_line(int x, int y_low, int y_high, int line_height, off
             wall_x = state_s.pos.x + (hit->dist * ray_dir->x);
             break;
     }
-    wall_x -= floorf(wall_x);
 
+    wall_x -= floorf(wall_x);
     int texture_x = (float) TEXTURE_SIZE * wall_x;
+
+    // adjusting the texture_x coordinate based on surface orientation and ray direction
     if ((hit->side == HORIZONTAL && ray_dir->x > 0) ||
         (hit->side == VERTICAL && ray_dir->y < 0))
     {
@@ -37,11 +39,14 @@ extern void draw_texture_line(int x, int y_low, int y_high, int line_height, off
     float texture_pos = (y_low - ((float) SCREEN_HEIGHT / 2) + ((float) line_height / 2)) * step;
 
     for (int y = y_low; y < y_high; y++) {
+        // AND operation to calculate the texture_y coordinate
         int texture_y = (int) texture_pos & (TEXTURE_SIZE - 1);
-        texture_pos += step;
 
+        texture_pos += step;
         uint32_t color = ((uint32_t*) state_s.surface->pixels)[(texture_y * TEXTURE_SIZE) + texture_x];
+
         if (hit->side == VERTICAL) {
+            // darkening the texture pixel for vertical wall
             color = (color >> 1) & DARK_TEXTURE_ACCESSOR;
         }
 

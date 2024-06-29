@@ -16,6 +16,7 @@ static void verline(int x, int y0, int y1, uint32_t color) {
 
 void render() {
     for (int x = 0; x < SCREEN_WIDTH; x++) {
+        // calculate the camera x coordinate in range of 1 and -1
         float cam_x = 2 * (x / (float) SCREEN_WIDTH) - 1;
 
         offset_pt_t ray_dir = {
@@ -29,6 +30,7 @@ void render() {
         };
 
         offset_pt_t delta_dist = {
+            // avoiding to division by zero
             ray_dir.x == 0 ? INFINITY : fabsf(TILE_WIDTH / ray_dir.x),
             ray_dir.y == 0 ? INFINITY : fabsf(TILE_WIDTH / ray_dir.y)
         };
@@ -38,6 +40,7 @@ void render() {
             delta_dist.y * (ray_dir.y < 0 ? (state_s.pos.y - map_pos.y) : (map_pos.y + 1 - state_s.pos.y)),
         };
 
+        // signing the ray direction coordinates to 1 or -1
         tile_pt_t step = {
             sign(ray_dir.x),
             sign(ray_dir.y)
@@ -56,6 +59,7 @@ void render() {
                 hit.side = VERTICAL;
             }
 
+            // bound check for new tile coordinates
             ASSERT(map_pos.x >= 0 &&
                     map_pos.x < MAP_SIZE &&
                     map_pos.y >= 0 &&

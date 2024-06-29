@@ -51,8 +51,10 @@ int main() {
     state_s.dir.x = 1.0f;
     state_s.dir.y = 0.1f;
 
+    // normalizing the direction vector
     normalize(&state_s.dir);
 
+    // setting up FOV to 66° (great for this style render)
     state_s.plane.x = 0.0f;
     state_s.plane.y = 0.66f;
 
@@ -76,7 +78,9 @@ int main() {
 
         handle_keys();
 
+        // clear the pixel buffer for new render
         memset(state_s.pixels, 0, sizeof(state_s.pixels));
+
         render();
 
         SDL_UpdateTexture(
