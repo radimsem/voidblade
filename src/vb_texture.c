@@ -6,9 +6,11 @@
 
 #include "vb_state.h"
 
+#include "vb_math.c"
+
 #include "vb_texture.h"
 
-const char *TEXTURE_FILE = "./res/wall.png";
+const char *TEXTURE_FILE = "./res/walls.png";
 
 extern void draw_texture_line(int x, int y_low, int y_high, int line_height, offset_pt_t *ray_dir, dda_hit_t *hit) {
     if (SDL_LockSurface(state_s.surface) < 0) {
@@ -24,9 +26,10 @@ extern void draw_texture_line(int x, int y_low, int y_high, int line_height, off
             wall_x = state_s.pos.x + (hit->dist * ray_dir->x);
             break;
     }
-
     wall_x -= floorf(wall_x);
+
     int texture_x = (float) TEXTURE_SIZE * wall_x;
+    int texture_x_offset = TEXTURE_SIZE * (hit->value - 1);
 
     // adjusting the texture_x coordinate based on surface orientation and ray direction
     if ((hit->side == HORIZONTAL && ray_dir->x > 0) ||
@@ -38,12 +41,12 @@ extern void draw_texture_line(int x, int y_low, int y_high, int line_height, off
     float step = ((float) TEXTURE_SIZE) / line_height;
     float texture_pos = (y_low - ((float) SCREEN_HEIGHT / 2) + ((float) line_height / 2)) * step;
 
-    for (int y = y_low; y < y_high; y++) {
-        // AND operation to calculate the texture_y coordinate
-        int texture_y = (int) texture_pos & (TEXTURE_SIZE - 1);
-
+    for (int y = y_high; y >= y_low; y--) {
+        int texture_y = min((int) texture_pos, TEXTURE_SIZE - 1);
         texture_pos += step;
-        uint32_t color = ((uint32_t*) state_s.surface->pixels)[(texture_y * TEXTURE_SIZE) + texture_x];
+
+        int texture_pixel_idx = (texture_y * state_s.surface->w) + (texture_x + texture_x_offset);
+        uint32_t color = ((uint32_t*) state_s.surface->pixels)[texture_pixel_idx];
 
         if (hit->side == VERTICAL) {
             // darkening the texture pixel for vertical wall

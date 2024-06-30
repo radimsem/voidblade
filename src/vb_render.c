@@ -3,7 +3,6 @@
 #include "vb_state.h"
 #include "vb_map.h"
 
-#include "vb_math.c"
 #include "vb_texture.c"
 
 #include "vb_render.h"
