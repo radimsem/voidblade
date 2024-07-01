@@ -10,9 +10,14 @@
 
 #include "vb_texture.h"
 
-const char *TEXTURE_FILE = "./res/walls.png";
-
-extern void draw_texture_line(int x, int y_low, int y_high, int line_height, offset_pt_t *ray_dir, dda_hit_t *hit) {
+extern void draw_texture_line(
+    int x,
+    int y_low,
+    int y_high,
+    int line_height,
+    offset_pt_t *ray_dir,
+    dda_hit_t *hit)
+{
     if (SDL_LockSurface(state_s.surface) < 0) {
         return;
     }
