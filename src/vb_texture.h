@@ -1,3 +1,7 @@
+#include <stdint.h>
+#include <sys/types.h>
+
+#include "vb_macros.h"
 #include "vb_types.h"
 #include "vb_render.h"
 
@@ -7,9 +11,20 @@
 #define TEXTURE_SIZE 64
 #define DARK_TEXTURE_ACCESSOR 0x7f7f7f
 
-#define TEXTURE_FILE "./rc/walls.png"
+#define TEXTURE_FILENAME_SIZE 32
 
-extern void draw_texture_line(
+#define VBT_WALLS 0
+#define VBT_CEILING 1
+
+extern const char* TEXTURE_FILES[TEXTURE_FILES_COUNT];
+
+static inline void darken_pixel(uint32_t *pixel);
+
+static inline uint32_t access_texture_pixel(int x, int y, int idx);
+
+extern void dceiling();
+
+extern void dwalls(
     int x,
     int y_low,
     int y_high,

@@ -1,16 +1,92 @@
-#include <stdint.h>
 #include <math.h>
 
-#include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_image.h>
 
 #include "vb_state.h"
+#include "vb_types.h"
 
 #include "vb_math.c"
 
 #include "vb_texture.h"
 
-extern void draw_texture_line(
+const char *TEXTURE_FILES[TEXTURE_FILES_COUNT] = {
+    "walls.png",
+    "ceiling.png"
+};
+
+static inline void darken_pixel(uint32_t *pixel) {
+    *pixel = (*pixel >> 1) & DARK_TEXTURE_ACCESSOR;
+}
+
+static inline uint32_t access_texture_pixel(int x, int y, int idx) {
+    // texture buffer bound check
+    if (idx >= TEXTURE_FILES_COUNT ||
+        x < 0 ||
+        x >= state_s.surfaces[idx]->w ||
+        y < 0 ||
+        y >= state_s.surfaces[idx]->h)
+    {
+        return 0;
+    }
+    return ((uint32_t*) state_s.surfaces[idx]->pixels)[(y * state_s.surfaces[idx]->w) + x];
+}
+
+// draw floor and ceiling textures
+extern void dceiling() {
+    offset_pt_t ray_min = {
+        state_s.dir.x - state_s.plane.x,
+        state_s.dir.y - state_s.plane.y
+    };
+    offset_pt_t ray_max = {
+        state_s.dir.x + state_s.plane.x,
+        state_s.dir.y + state_s.plane.y
+    };
+
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        // curr y position compared to the center of the screen
+        float horizon = y - ((float) CAMERA_HEIGHT);
+
+        float row_dist = ((float) CAMERA_HEIGHT) / horizon;
+        offset_pt_t step = {
+            row_dist * (ray_max.x - ray_min.x) / SCREEN_WIDTH,
+            row_dist * (ray_max.y - ray_min.y) / SCREEN_WIDTH,
+        };
+
+        offset_pt_t ceiling_offset = {
+            state_s.pos.x + (row_dist * ray_min.x),
+            state_s.pos.y + (row_dist * ray_min.y),
+        };
+
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            tile_pt_t ceiling_tile = {
+                (int) ceiling_offset.x,
+                (int) ceiling_offset.y
+            };
+            tile_pt_t texture_pos = {
+                (int) min(TEXTURE_SIZE * (ceiling_offset.x - ceiling_tile.x), TEXTURE_SIZE - 1),
+                (int) min(TEXTURE_SIZE * (ceiling_offset.y - ceiling_tile.y), TEXTURE_SIZE - 1),
+            };
+
+            ceiling_offset.x += step.x;
+            ceiling_offset.y += step.y;
+
+            uint32_t pixel;
+            // ceiling
+            pixel = access_texture_pixel(texture_pos.x + TEXTURE_SIZE, texture_pos.y, VBT_CEILING);
+            darken_pixel(&pixel);
+            state_s.pixels[(y * SCREEN_WIDTH) + x] = pixel;
+
+            // floor
+            pixel = access_texture_pixel(texture_pos.x, texture_pos.y, VBT_CEILING);
+            darken_pixel(&pixel);
+            // symetric render from ceiling
+            state_s.pixels[(((SCREEN_HEIGHT - 1) - y) * SCREEN_WIDTH) + x] = pixel;
+        }
+    }
+}
+
+// draw textures for walls that were hit by DDA
+extern void dwalls(
     int x,
     int y_low,
     int y_high,
@@ -18,10 +94,6 @@ extern void draw_texture_line(
     offset_pt_t *ray_dir,
     dda_hit_t *hit)
 {
-    if (SDL_LockSurface(state_s.surface) < 0) {
-        return;
-    }
-
     float wall_x;
     switch (hit->side) {
         case HORIZONTAL:
@@ -50,16 +122,11 @@ extern void draw_texture_line(
         int texture_y = min((int) texture_pos, TEXTURE_SIZE - 1);
         texture_pos += step;
 
-        int texture_pixel_idx = (texture_y * state_s.surface->w) + (texture_x + texture_x_offset);
-        uint32_t color = ((uint32_t*) state_s.surface->pixels)[texture_pixel_idx];
-
+        uint32_t pixel = access_texture_pixel((texture_x + texture_x_offset), texture_y, VBT_WALLS);
         if (hit->side == VERTICAL) {
-            // darkening the texture pixel for vertical wall
-            color = (color >> 1) & DARK_TEXTURE_ACCESSOR;
+            darken_pixel(&pixel);
         }
 
-        state_s.pixels[(y * SCREEN_WIDTH) + x] = color;
+        state_s.pixels[(y * SCREEN_WIDTH) + x] = pixel;
     }
-
-    SDL_UnlockSurface(state_s.surface);
 }

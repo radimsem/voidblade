@@ -7,6 +7,7 @@
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_keycode.h>
+#include <stdio.h>
 
 #include "vb_input.c"
 #include "vb_render.c"
@@ -42,8 +43,14 @@ int main() {
     );
     ASSERT(state_s.texture, "failed to create SDL texture: %s", SDL_GetError());
 
-    state_s.surface = IMG_Load(TEXTURE_FILE);
-    ASSERT(state_s.surface, "failed to create SDL surface from image %s: %s", TEXTURE_FILE, SDL_GetError());
+    char texture_path[TEXTURE_FILENAME_SIZE];
+    for (int i = 0; i < TEXTURE_FILES_COUNT; i++) {
+        snprintf(texture_path, TEXTURE_FILENAME_SIZE,
+                "%s/%s", RESOURCE_DIR, TEXTURE_FILES[i]);
+
+        state_s.surfaces[i] = IMG_Load(texture_path);
+        ASSERT(state_s.surfaces[i], "failed to create SDL surface from image %s: %s", TEXTURE_FILES[i], SDL_GetError());
+    }
 
     state_s.pos.x = 4.5f;
     state_s.pos.y = 2.5f;

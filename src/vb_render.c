@@ -14,6 +14,8 @@ static void verline(int x, int y0, int y1, uint32_t color) {
 }
 
 void render() {
+    dceiling();
+
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         // calculate the camera x coordinate in range of 1 and -1
         float cam_x = 2 * (x / (float) SCREEN_WIDTH) - 1;
@@ -88,8 +90,6 @@ void render() {
             y0 = max((SCREEN_HEIGHT / 2) - (h / 2), 0),
             y1 = min((SCREEN_HEIGHT / 2) + (h / 2), SCREEN_HEIGHT - 1);
 
-        verline(x, 0, y0, 0xFF202020);
-        draw_texture_line(x, y0, y1, h, &ray_dir, &hit);
-        verline(x, y1, SCREEN_HEIGHT - 1, 0xFF505050);
+        dwalls(x, y0, y1, h, &ray_dir, &hit);
     }
 }
