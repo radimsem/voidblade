@@ -11,6 +11,8 @@
 #define CAMERA_HEIGHT SCREEN_HEIGHT / 2
 
 #define RESOURCE_DIR "rc"
-#define TEXTURE_FILES_COUNT 2
+#define NUM_TEXTURE_FILES 2
+
+#define NUM_SPRITES 11
 
 #endif

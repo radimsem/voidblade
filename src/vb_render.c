@@ -2,32 +2,25 @@
 #include "vb_types.h"
 #include "vb_state.h"
 #include "vb_map.h"
-
-#include "vb_texture.c"
-
+#include "vb_math.h"
+#include "vb_texture.h"
 #include "vb_render.h"
 
-static void verline(int x, int y0, int y1, uint32_t color) {
-    for (int y = y0; y <= y1; y++) {
-        state_s.pixels[(y * SCREEN_WIDTH) + x] = color;
-    }
-}
-
-void render() {
-    dceiling();
+void render(state_t *state) {
+    dceiling(state);
 
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         // calculate the camera x coordinate in range of 1 and -1
         float cam_x = 2 * (x / (float) SCREEN_WIDTH) - 1;
 
         offset_pt_t ray_dir = {
-            state_s.dir.x + state_s.plane.x * cam_x,
-            state_s.dir.y + state_s.plane.y * cam_x,
+            state->dir.x + state->plane.x * cam_x,
+            state->dir.y + state->plane.y * cam_x,
         };
 
         tile_pt_t map_pos = {
-            (int) state_s.pos.x,
-            (int) state_s.pos.y
+            (int) state->pos.x,
+            (int) state->pos.y
         };
 
         offset_pt_t delta_dist = {
@@ -37,8 +30,8 @@ void render() {
         };
 
         offset_pt_t side_dist = {
-            delta_dist.x * (ray_dir.x < 0 ? (state_s.pos.x - map_pos.x) : (map_pos.x + 1 - state_s.pos.x)),
-            delta_dist.y * (ray_dir.y < 0 ? (state_s.pos.y - map_pos.y) : (map_pos.y + 1 - state_s.pos.y)),
+            delta_dist.x * (ray_dir.x < 0 ? (state->pos.x - map_pos.x) : (map_pos.x + 1 - state->pos.x)),
+            delta_dist.y * (ray_dir.y < 0 ? (state->pos.y - map_pos.y) : (map_pos.y + 1 - state->pos.y)),
         };
 
         // signing the ray direction coordinates to 1 or -1
@@ -72,8 +65,8 @@ void render() {
             hit.value = MAP_DATA[(map_pos.y * MAP_SIZE) + map_pos.x];
         }
 
-        hit.pos.x = state_s.pos.x + side_dist.x;
-        hit.pos.y = state_s.pos.y + side_dist.y;
+        hit.pos.x = state->pos.x + side_dist.x;
+        hit.pos.y = state->pos.y + side_dist.y;
 
         switch (hit.side) {
             case HORIZONTAL:
@@ -84,12 +77,13 @@ void render() {
                 break;
             }
         }
+        state->zbuf[x] = hit.dist;
 
         int
             h = SCREEN_HEIGHT / hit.dist,
             y0 = max((SCREEN_HEIGHT / 2) - (h / 2), 0),
             y1 = min((SCREEN_HEIGHT / 2) + (h / 2), SCREEN_HEIGHT - 1);
 
-        dwalls(x, y0, y1, h, &ray_dir, &hit);
+        dwalls(state, x, y0, y1, h, &ray_dir, &hit);
     }
 }

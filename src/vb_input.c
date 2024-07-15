@@ -1,27 +1,25 @@
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_scancode.h>
 
-#include "vb_state.h"
-
-#include "vb_movement.c"
-
+#include "vb_movement.h"
 #include "vb_input.h"
 
-void handle_keys() {
+void handle_keys(state_t *state) {
     SDL_PumpEvents();
 
-    if (state_s.keys[SDL_SCANCODE_W]) {
-        move(&state_s.pos, &state_s.dir, state_s.speed.move, FORWARD);
+    if (state->keys[SDL_SCANCODE_W]) {
+        move(&state->pos, &state->dir, state->speed.move, FORWARD);
     }
-    if (state_s.keys[SDL_SCANCODE_S]) {
-        move(&state_s.pos, &state_s.dir, state_s.speed.move, BACKWARD);
+    if (state->keys[SDL_SCANCODE_S]) {
+        move(&state->pos, &state->dir, state->speed.move, BACKWARD);
     }
 
-    if (state_s.keys[SDL_SCANCODE_A]) {
-        rotate(&state_s.dir, -state_s.speed.rot);
-        rotate(&state_s.plane, -state_s.speed.rot);
+    if (state->keys[SDL_SCANCODE_A]) {
+        rotate(&state->dir, -state->speed.rot);
+        rotate(&state->plane, -state->speed.rot);
     }
-    if (state_s.keys[SDL_SCANCODE_D]) {
-        rotate(&state_s.dir, +state_s.speed.rot);
-        rotate(&state_s.plane, +state_s.speed.rot);
+    if (state->keys[SDL_SCANCODE_D]) {
+        rotate(&state->dir, +state->speed.rot);
+        rotate(&state->plane, +state->speed.rot);
     }
 }

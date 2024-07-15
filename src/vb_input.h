@@ -1,8 +1,10 @@
-#include <SDL2/SDL_events.h>
+#include <stdint.h>
+
+#include "vb_state.h"
 
 #ifndef __VB_INPUT__
 #define __VB_INPUT__
 
-void handle_keys(void);
+void handle_keys(state_t *state);
 
 #endif

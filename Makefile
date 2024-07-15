@@ -8,17 +8,15 @@ CCFLAGS += -Wall
 CCFLAGS += -lSDL2_image
 CCFLAGS += -lm
 
-SRC = src/main.c
-OBJ = ./main.o
-EXE = ./voidblade
+SRC = $(wildcard src/*.c)
+EXE = voidblade
 
 all: $(EXE)
 
-$(OBJ): $(SRC)
-	$(CC) $(CCFLAGS) -c $(SRC)
-
-$(EXE): $(OBJ)
-	$(CC) $(CCFLAGS) -o $(EXE) $(OBJ)
+$(EXE): $(SRC)
+	$(CC) -o $@ $^ $(CCFLAGS)
 
 clean:
-	rm -f $(OBJ) $(EXE)
+	rm -f $(EXE)
+
+.PHONY: all clean

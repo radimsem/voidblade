@@ -16,15 +16,12 @@
 #define VBT_WALLS 0
 #define VBT_CEILING 1
 
-extern const char* TEXTURE_FILES[TEXTURE_FILES_COUNT];
+extern const char* TEXTURE_FILES[NUM_TEXTURE_FILES];
 
-static inline void darken_pixel(uint32_t *pixel);
+void dceiling(state_t *state);
 
-static inline uint32_t access_texture_pixel(int x, int y, int idx);
-
-extern void dceiling();
-
-extern void dwalls(
+void dwalls(
+    state_t *state,
     int x,
     int y_low,
     int y_high,

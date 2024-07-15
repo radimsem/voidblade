@@ -1,15 +1,12 @@
 #include <math.h>
-
 #include <SDL2/SDL_image.h>
 
 #include "vb_state.h"
+#include "vb_math.h"
 #include "vb_types.h"
-
-#include "vb_math.c"
-
 #include "vb_texture.h"
 
-const char *TEXTURE_FILES[TEXTURE_FILES_COUNT] = {
+const char *TEXTURE_FILES[NUM_TEXTURE_FILES] = {
     "walls.png",
     "ceiling.png"
 };
@@ -18,28 +15,29 @@ static inline void darken_pixel(uint32_t *pixel) {
     *pixel = (*pixel >> 1) & DARK_TEXTURE_ACCESSOR;
 }
 
-static inline uint32_t access_texture_pixel(int x, int y, int idx) {
+static inline uint32_t access_texture_pixel(state_t *state, int x, int y, int idx) {
     // texture buffer bound check
-    if (idx >= TEXTURE_FILES_COUNT ||
+    if (!(*state->surfaces) ||
+        idx >= NUM_TEXTURE_FILES ||
         x < 0 ||
-        x >= state_s.surfaces[idx]->w ||
+        x >= state->surfaces[idx]->w ||
         y < 0 ||
-        y >= state_s.surfaces[idx]->h)
+        y >= state->surfaces[idx]->h)
     {
         return 0;
     }
-    return ((uint32_t*) state_s.surfaces[idx]->pixels)[(y * state_s.surfaces[idx]->w) + x];
+    return ((uint32_t*) state->surfaces[idx]->pixels)[(y * state->surfaces[idx]->w) + x];
 }
 
 // draw floor and ceiling textures
-extern void dceiling() {
+void dceiling(state_t *state) {
     offset_pt_t ray_min = {
-        state_s.dir.x - state_s.plane.x,
-        state_s.dir.y - state_s.plane.y
+        state->dir.x - state->plane.x,
+        state->dir.y - state->plane.y
     };
     offset_pt_t ray_max = {
-        state_s.dir.x + state_s.plane.x,
-        state_s.dir.y + state_s.plane.y
+        state->dir.x + state->plane.x,
+        state->dir.y + state->plane.y
     };
 
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
@@ -53,8 +51,8 @@ extern void dceiling() {
         };
 
         offset_pt_t ceiling_offset = {
-            state_s.pos.x + (row_dist * ray_min.x),
-            state_s.pos.y + (row_dist * ray_min.y),
+            state->pos.x + (row_dist * ray_min.x),
+            state->pos.y + (row_dist * ray_min.y),
         };
 
         for (int x = 0; x < SCREEN_WIDTH; x++) {
@@ -72,21 +70,22 @@ extern void dceiling() {
 
             uint32_t pixel;
             // ceiling
-            pixel = access_texture_pixel(texture_pos.x + TEXTURE_SIZE, texture_pos.y, VBT_CEILING);
+            pixel = access_texture_pixel(state, texture_pos.x + TEXTURE_SIZE, texture_pos.y, VBT_CEILING);
             darken_pixel(&pixel);
-            state_s.pixels[(y * SCREEN_WIDTH) + x] = pixel;
+            state->pixels[(y * SCREEN_WIDTH) + x] = pixel;
 
             // floor
-            pixel = access_texture_pixel(texture_pos.x, texture_pos.y, VBT_CEILING);
+            pixel = access_texture_pixel(state, texture_pos.x, texture_pos.y, VBT_CEILING);
             darken_pixel(&pixel);
             // symetric render from ceiling
-            state_s.pixels[(((SCREEN_HEIGHT - 1) - y) * SCREEN_WIDTH) + x] = pixel;
+            state->pixels[(((SCREEN_HEIGHT - 1) - y) * SCREEN_WIDTH) + x] = pixel;
         }
     }
 }
 
 // draw textures for walls that were hit by DDA
-extern void dwalls(
+void dwalls(
+    state_t *state,
     int x,
     int y_low,
     int y_high,
@@ -97,10 +96,10 @@ extern void dwalls(
     float wall_x;
     switch (hit->side) {
         case HORIZONTAL:
-            wall_x = state_s.pos.y + (hit->dist * ray_dir->y);
+            wall_x = state->pos.y + (hit->dist * ray_dir->y);
             break;
         case VERTICAL:
-            wall_x = state_s.pos.x + (hit->dist * ray_dir->x);
+            wall_x = state->pos.x + (hit->dist * ray_dir->x);
             break;
     }
     wall_x -= floorf(wall_x);
@@ -122,11 +121,11 @@ extern void dwalls(
         int texture_y = min((int) texture_pos, TEXTURE_SIZE - 1);
         texture_pos += step;
 
-        uint32_t pixel = access_texture_pixel((texture_x + texture_x_offset), texture_y, VBT_WALLS);
+        uint32_t pixel = access_texture_pixel(state, (texture_x + texture_x_offset), texture_y, VBT_WALLS);
         if (hit->side == VERTICAL) {
             darken_pixel(&pixel);
         }
 
-        state_s.pixels[(y * SCREEN_WIDTH) + x] = pixel;
+        state->pixels[(y * SCREEN_WIDTH) + x] = pixel;
     }
 }

@@ -2,7 +2,6 @@
 
 #include "vb_types.h"
 #include "vb_map.h"
-
 #include "vb_movement.h"
 
 void rotate(offset_pt_t *v, float rot) {

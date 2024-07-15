@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "vb_state.h"
 #include "vb_types.h"
 
 #ifndef __VB_RENDER__
@@ -17,8 +18,6 @@ typedef struct {
     float dist;
 } dda_hit_t;
 
-static void verline(int x, int y0, int y1, uint32_t color);
-
-void render(void);
+void render(state_t *state);
 
 #endif
